@@ -14,9 +14,19 @@ import azure.durable_functions as df
 
 
 def orchestrator_function(context: df.DurableOrchestrationContext):
-    result1 = yield context.call_activity('Hello', "Tokyo")
-    result2 = yield context.call_activity('Hello', "Seattle")
-    result3 = yield context.call_activity('Hello', "London")
-    return [result1, result2, result3]
+    
+    inputParam = context.get_input()
+
+    tasks = []
+    results = []
+
+    tasks.append(context.call_activity('Hello', "Tokyo"))
+    tasks.append(context.call_activity('Hello', "Seattle"))
+    tasks.append(context.call_activity('Hello', "London"))
+    
+    results = yield context.task_all(tasks)
+
+    return [results]
+
 
 main = df.Orchestrator.create(orchestrator_function)
